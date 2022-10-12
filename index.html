@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<!--
+	Read Only by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>My Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="prism.css">
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<section id="header">
+				<header>
+					<span class="image avatar"><img src="images/Black and White Minimal Monogram Logo.gif" alt="" /></span>
+					<h1 id="logo"><a href="#">Minttu Lehmann</a></h1>
+					<p>Software development student<br />
+					showcasing my projects</p>
+				</header>
+				<nav id="nav">
+					<ul>
+						<li><a href="#one" class="active">Who am I?</a></li>
+						<li><a href="#two">Things I Can Do</a></li>
+						<li><a href="#three">One of my projects: API mash-up</a></li>
+					</ul>
+				</nav>
+				<footer>
+					<ul class="icons">
+						<li><a href="https://github.com/Minleh" class="icon brands fa-github"><span class="label">Github</span></a></li>
+					</ul>
+				</footer>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- One -->
+							<section id="one">
+								<div class="image main" data-position="center">
+									<img src="images/Technologi GoDaddy Store Image.png" alt="" />
+								</div>
+								<div class="container">
+									<header class="major">
+										<h2>Who am I?</h2>
+									</header>
+									<img align="center" alt="Coding" width="350" src="https://camo.githubusercontent.com/5ddf73ad3a205111cf8c686f687fc216c2946a75005718c8da5b837ad9de78c9/68747470733a2f2f7468756d62732e6766796361742e636f6d2f4576696c4e657874446576696c666973682d736d616c6c2e676966">
+									<p>I'm an advocate for lifelong learning. Currently studying programming and software development. I'm mainly focusing on learning Python and C#. I created this website to showcase my coding projects. </p>
+								</div>
+							</section>
+
+						<!-- Two -->
+							<section id="two">
+								<div class="container">
+									<h3>Things I Can Do</h3>
+									<p>A few of my core skills.</p>
+									<ul class="feature-icons">
+										<li class="icon solid fa-code">Code in Python & C#</li>
+										<li class="icon solid fa-book">Learning skills & Problem solving</li>
+										<li class="icon solid fa-coffee">Communication & Networking</li>
+										<li class="icon solid fa-users">Teamwork & Project management</li>
+									</ul>
+								</div>
+							</section>
+
+						<!-- Three -->
+							<section id="three">
+								<div class="container">
+									<h3>One of my projects: API mash-up with Python</h3>
+									<p>This program uses two different APIs. The TasteDive API lets you provide a movie as input and returns a set of related items. 
+										The OMDB API gives data about the provided movie, including scores from review sites.
+									   This program puts these two together so that you can get a list of related movies sorted according to their Rotten Tomatoes score.</p>
+									<div class="features">
+										<article>
+											<div class="container">
+												<h4>Fetching recomendations from TasteDive API</h4>
+												<p>The first fuction fetches data about five recommended movies. The second function extracts from the data just the movie titles. The third function combines these two together to create a list of recommended movies.</p>
+												
+													<pre>
+														<code id ="code" class="language-python">
+import json
+import requests
+
+#Takes movie name as an input and retuns 5 similar movies (fetched from tastedive API)
+def get_movies_from_tastedive(moviename):
+	baseurl = "https://tastedive.com/api/similar"
+	params_diction = {}
+	params_diction["q"] = moviename
+	params_diction["type"] = "movies"
+	params_diction["limit"] = "5"
+	resp = requests.get(baseurl, params=params_diction)
+	five_similar = resp.json()
+	return five_similar
+	
+#Function that extracts just the list of movie titles
+def extract_movie_titles(dictionary):
+	movietitles = []
+	for film in dictionary['Similar']['Results']:
+		movietitles.append(film['Name'])
+	return movietitles
+
+#Takes a list of movie titles as input. Returns five related movie titles for each movie.
+def get_related_titles(list_of_movies):
+	list_of_similar_movies = []
+	for movie in list_of_movies:
+		dictionaryofmovies = get_movies_from_tastedive(movie)
+		listofmovietitles = extract_movie_titles(dictionaryofmovies)
+		for one_movie in listofmovietitles:
+			if one_movie in list_of_similar_movies:
+				continue
+			else:
+				list_of_similar_movies.append(one_movie)
+	return list_of_similar_movies
+													  
+												</code>
+												</pre>
+											</div>
+										</article>
+										<article>
+											<div class="container">
+												<h4>Movie data from OMDB API</h4>
+												<p>To take the a bit further we're going to fetch data from OMDB API.
+													The first function returns a Python dictionary with information about the recommended movie.
+													The second function extracts just the Rotten Tomatoes ratings. 
+													The third function puts all the previous five funtions together to give movie recommendations sorted in descending order by their Rotten Tomatoes ratings.</p>
+													<pre>
+														<code id ="code" class="language-python">
+#Fetches data from OMDB. Returns dictionary with information about the movie. 
+def get_movie_data(movietitle):
+	baseurl = "http://www.omdbapi.com/"
+	params_diction = {}
+	params_diction['apikey'] = '5081bf1b'
+	params_diction["t"] = movietitle
+	params_diction["r"] = 'json'
+	resp = requests.get(baseurl, params=params_diction)
+	movie_data = json.loads(resp.text)
+	return movie_data
+
+
+#Takes OMDB dictionary results and extracts the Rotten Tomatoes rating. If no rotten tomatoes rating, returns 0.
+def get_movie_rating(omdb_dictionary):
+	rt_rating = 0
+	for rate in omdb_dictionary['Ratings']:
+		if (rate["Source"]) == "Rotten Tomatoes":
+			rt_rating = int(rate['Value'][:-1])
+	return rt_rating
+
+
+#takes a list of movies as input. Returns five related movies per title.
+#Movies are sorted in descending order by their Rotten Tomatoes rating.
+def get_sorted_recommendations(list_of_movies):
+	related_movies = sorted(get_related_titles(list_of_movies), key= lambda m: (get_movie_rating(get_movie_data(m)),m), reverse = True)
+	return related_movies
+
+
+#Test the program here
+print(get_sorted_recommendations(["Pulp fiction", "Guardians of the galaxy"]))	
+												</code>
+											  </pre>
+											</div>
+										</article>
+									</div>
+								</div>
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<section id="footer">
+						<div class="container">
+							<ul class="copyright">
+								<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="prism.js"></script>
+
+	</body>
+</html>
